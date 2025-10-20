@@ -1,0 +1,42 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+*.env
+venv/
+env/
+ENV/
+
+# Django
+*.log
+db.sqlite3
+/staticfiles/
+media/
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# JetBrains
+.idea/
+
+# PyCharm
+*.iml
+
+# Node (if using JS packages)
+node_modules/
+
+# Coverage
+htmlcov/
+.coverage
+
+# Pytest
+.pytest_cache/
+.cache/
+
+# Misc
+*.swp

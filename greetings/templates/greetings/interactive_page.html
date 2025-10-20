@@ -1,0 +1,1374 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config.title }} - Interactive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            {% if config.event == 'diwali' %}
+            background: linear-gradient(135deg, #0a0606 0%, #1a0f0f 30%, #2d1810 50%, #1a0f0f 70%, #0a0606 100%);
+            {% elif config.event == 'newyear' %}
+            background: linear-gradient(135deg, #0a0a15 0%, #1a1a30 50%, #0a0a15 100%);
+            {% elif config.event == 'bhaidooj' %}
+            background: linear-gradient(135deg, #1a0a12 0%, #2d1425 50%, #1a0a12 100%);
+            {% endif %}
+        }
+
+        /* Header */
+        .header {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: {{ config.theme_color }};
+            text-shadow: 0 0 20px {{ config.theme_color }};
+            margin-bottom: 10px;
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            color: #fff;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        {% if config.event == 'diwali' %}
+        /* Diwali Interactive Section */
+        .interactive-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 200px);
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Fire Source */
+        .fire-source {
+            position: fixed;
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+            z-index: 50;
+            cursor: move;
+            touch-action: none;
+        }
+
+        .fire {
+            width: 80px;
+            height: 100px;
+            position: relative;
+            animation: fireGlow 1.5s infinite;
+        }
+
+        .flame {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 80px;
+            background: radial-gradient(ellipse at center bottom, 
+                #ffeb3b 0%, 
+                #ff9800 30%, 
+                #f44336 60%, 
+                transparent 100%);
+            border-radius: 50% 50% 20% 20%;
+            animation: flicker 0.3s infinite alternate;
+        }
+
+        .flame::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 50px;
+            background: radial-gradient(ellipse at center, 
+                #ffff00 0%, 
+                #ffeb3b 40%, 
+                transparent 70%);
+            border-radius: 50%;
+            animation: innerFlicker 0.2s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scaleY(1) scaleX(1); }
+            100% { transform: translateX(-50%) scaleY(1.05) scaleX(0.95); }
+        }
+
+        @keyframes innerFlicker {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes fireGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px #ff9800); }
+            50% { filter: drop-shadow(0 0 40px #ffeb3b); }
+        }
+
+        .fire-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            color: #ffeb3b;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff9800;
+            font-size: 0.9rem;
+        }
+
+        /* Diyas Container */
+        .diyas-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .diya-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .diya {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+        }
+
+        .diya:hover {
+            transform: scale(1.05);
+        }
+
+        /* Realistic Diya Body - Clay pot with gradients and shadows */
+        .diya-body {
+            width: 90px;
+            height: 45px;
+            background: linear-gradient(180deg, 
+                #c19a6b 0%,
+                #a67c52 30%,
+                #8b6f47 60%,
+                #6b5639 100%);
+            border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 
+                inset 0 -8px 15px rgba(0, 0, 0, 0.4),
+                inset 0 3px 8px rgba(255, 255, 255, 0.2),
+                0 8px 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #6b5639;
+        }
+
+        /* Add texture to diya body */
+        .diya-body::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 10%;
+            width: 80%;
+            height: 50%;
+            background: linear-gradient(90deg, 
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 100%);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        /* Diya spout/beak (where oil pours from) */
+        .diya-body::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 18px;
+            background: linear-gradient(180deg, 
+                #a67c52 0%,
+                #8b6f47 50%,
+                #6b5639 100%);
+            border-radius: 50% 50% 30% 30%;
+            box-shadow: 
+                inset 0 -3px 5px rgba(0, 0, 0, 0.4),
+                inset 0 1px 3px rgba(255, 255, 255, 0.2);
+            border: 1px solid #6b5639;
+        }
+
+        /* Oil inside diya (visible when lit) */
+        .diya-oil {
+            position: absolute;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 65px;
+            height: 20px;
+            background: radial-gradient(ellipse at center, 
+                rgba(255, 200, 0, 0.3) 0%,
+                rgba(255, 150, 0, 0.2) 60%,
+                transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .diya.lit .diya-oil {
+            opacity: 1;
+        }
+
+        /* Realistic Flame with multiple layers */
+        .diya-flame {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 50px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            filter: blur(0.5px);
+        }
+
+        /* Outer flame layer (red-orange) */
+        .diya-flame::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 50px;
+            background: radial-gradient(ellipse at center bottom, 
+                rgba(255, 235, 59, 1) 0%,
+                rgba(255, 193, 7, 1) 20%,
+                rgba(255, 152, 0, 0.9) 40%,
+                rgba(255, 87, 34, 0.7) 60%,
+                rgba(244, 67, 54, 0.4) 80%,
+                transparent 100%);
+            border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
+            animation: flameFlicker 1.2s ease-in-out infinite;
+        }
+
+        /* Inner flame layer (bright yellow core) */
+        .diya-flame::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22px;
+            height: 35px;
+            background: radial-gradient(ellipse at center, 
+                rgba(255, 255, 255, 1) 0%,
+                rgba(255, 255, 200, 1) 20%,
+                rgba(255, 235, 59, 0.9) 50%,
+                rgba(255, 193, 7, 0.6) 70%,
+                transparent 100%);
+            border-radius: 50% 50% 40% 40%;
+            animation: innerFlameFlicker 0.8s ease-in-out infinite alternate;
+            filter: blur(1px);
+        }
+
+        .diya.lit .diya-flame {
+            opacity: 1;
+        }
+
+        /* Flame glow effect */
+        .diya.lit .diya-flame {
+            filter: blur(0.5px) drop-shadow(0 0 15px rgba(255, 193, 7, 0.8))
+                    drop-shadow(0 0 25px rgba(255, 152, 0, 0.6))
+                    drop-shadow(0 0 35px rgba(255, 87, 34, 0.4));
+        }
+
+        @keyframes flameFlicker {
+            0% { 
+                transform: translateX(-50%) scaleY(1) scaleX(1);
+                opacity: 1;
+            }
+            25% { 
+                transform: translateX(-48%) scaleY(1.05) scaleX(0.98);
+                opacity: 0.95;
+            }
+            50% { 
+                transform: translateX(-52%) scaleY(0.98) scaleX(1.02);
+                opacity: 1;
+            }
+            75% { 
+                transform: translateX(-50%) scaleY(1.03) scaleX(0.97);
+                opacity: 0.97;
+            }
+            100% { 
+                transform: translateX(-50%) scaleY(1) scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes innerFlameFlicker {
+            0% { 
+                transform: translateX(-50%) scaleY(1);
+                opacity: 0.9;
+            }
+            100% { 
+                transform: translateX(-50%) scaleY(1.08);
+                opacity: 1;
+            }
+        }
+
+        /* Smoke effect when lit */
+        .diya-smoke {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(to top, 
+                rgba(150, 150, 150, 0.3) 0%,
+                rgba(200, 200, 200, 0.1) 50%,
+                transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: none;
+            filter: blur(3px);
+        }
+
+        .diya.lit .diya-smoke {
+            opacity: 1;
+            animation: smoke 3s ease-in-out infinite;
+        }
+
+        @keyframes smoke {
+            0% {
+                transform: translateX(-50%) translateY(0) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateX(-45%) translateY(-20px) scale(1.3);
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateX(-50%) translateY(-40px) scale(1.6);
+                opacity: 0;
+            }
+        }
+
+        .diya-message {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 235, 59, 0.3);
+        }
+
+        .diya.lit .diya-message {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 100;
+            border: 2px solid rgba(255, 235, 59, 0.3);
+        }
+
+        .progress-text {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800);
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px #ffeb3b;
+        }
+
+        /* Completion Message */
+        .completion-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .completion-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .completion-card {
+            background: linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(255, 152, 0, 0.1));
+            backdrop-filter: blur(20px);
+            padding: 60px 40px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            border: 2px solid rgba(255, 235, 59, 0.5);
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .completion-card h2 {
+            font-size: 2.5rem;
+            color: #ffeb3b;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ff9800;
+        }
+
+        .completion-card p {
+            font-size: 1.3rem;
+            color: white;
+            line-height: 1.8;
+            margin: 20px 0;
+        }
+
+        .completion-icon {
+            font-size: 5rem;
+            margin: 20px 0;
+            animation: bounce 1s infinite;
+        }
+
+        .back-btn {
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #ffeb3b, #ff9800);
+            color: #333;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 235, 59, 0.5);
+        }
+
+        /* Drag Ghost */
+        .drag-ghost {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.8;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        {% endif %}
+
+        /* Responsive Design - True responsiveness with container queries approach */
+        
+        /* Large Desktop */
+        @media (min-width: 1400px) {
+            .diyas-container {
+                grid-template-columns: repeat(7, 1fr);
+                max-width: 1400px;
+            }
+        }
+
+        /* Desktop */
+        @media (min-width: 1024px) and (max-width: 1399px) {
+            .diyas-container {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 35px;
+            }
+            
+            .diya {
+                width: 110px;
+                height: 110px;
+            }
+        }
+
+        /* Tablet Landscape */
+        @media (min-width: 769px) and (max-width: 1023px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .instruction {
+                font-size: 1rem;
+            }
+
+            .diyas-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 30px;
+                padding: 20px;
+            }
+
+            .diya {
+                width: 100px;
+                height: 100px;
+            }
+
+            .diya-body {
+                width: 80px;
+                height: 40px;
+            }
+
+            .fire-source {
+                left: 30px;
+            }
+        }
+
+        /* Tablet Portrait & Mobile Landscape */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+                padding: 0 10px;
+                line-height: 1.3;
+            }
+
+            .instruction {
+                font-size: 0.95rem;
+                padding: 0 15px;
+            }
+
+            .fire-source {
+                left: 50%;
+                transform: translateX(-50%);
+                top: auto;
+                bottom: 100px;
+                z-index: 100;
+            }
+
+            .fire {
+                width: 70px;
+                height: 85px;
+            }
+
+            .flame {
+                width: 50px;
+                height: 65px;
+            }
+
+            .interactive-container {
+                padding: 20px 10px 140px;
+                min-height: calc(100vh - 180px);
+            }
+
+            .diyas-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .diya {
+                width: 100px;
+                height: 100px;
+            }
+
+            .diya-body {
+                width: 75px;
+                height: 38px;
+            }
+
+            .diya-message {
+                font-size: 0.88rem;
+                padding: 12px;
+                min-height: 75px;
+            }
+
+            .progress-container {
+                width: calc(100% - 40px);
+                padding: 15px;
+                bottom: 15px;
+            }
+
+            .progress-text {
+                font-size: 1rem;
+            }
+        }
+
+        /* Mobile Portrait */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+                line-height: 1.2;
+            }
+
+            .instruction {
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+
+            .diyas-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+                padding: 10px;
+            }
+
+            .diya {
+                width: 85px;
+                height: 85px;
+            }
+
+            .diya-body {
+                width: 65px;
+                height: 33px;
+            }
+
+            .diya-flame::before {
+                width: 28px;
+                height: 42px;
+            }
+
+            .diya-flame::after {
+                width: 18px;
+                height: 28px;
+            }
+
+            .diya-message {
+                font-size: 0.82rem;
+                padding: 10px;
+                min-height: 70px;
+                line-height: 1.5;
+            }
+
+            .fire {
+                width: 60px;
+                height: 75px;
+            }
+
+            .flame {
+                width: 42px;
+                height: 55px;
+            }
+
+            .fire-label {
+                font-size: 0.8rem;
+            }
+
+            .completion-card {
+                padding: 35px 20px;
+                width: 95%;
+            }
+
+            .completion-card h2 {
+                font-size: 1.7rem;
+            }
+
+            .completion-card p {
+                font-size: 1rem;
+            }
+
+            .completion-icon {
+                font-size: 3.5rem;
+            }
+
+            .back-btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 380px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .instruction {
+                font-size: 0.8rem;
+            }
+
+            .diyas-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .diya {
+                width: 75px;
+                height: 75px;
+            }
+
+            .diya-body {
+                width: 58px;
+                height: 30px;
+            }
+
+            .diya-flame::before {
+                width: 25px;
+                height: 38px;
+            }
+
+            .diya-flame::after {
+                width: 16px;
+                height: 25px;
+            }
+
+            .diya-message {
+                font-size: 0.78rem;
+                padding: 8px;
+                min-height: 65px;
+            }
+
+            .fire {
+                width: 55px;
+                height: 70px;
+            }
+
+            .completion-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .completion-card p {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Extra Small Mobile */
+        @media (max-width: 320px) {
+            .diyas-container {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .diya {
+                width: 95px;
+                height: 95px;
+            }
+
+            .diya-body {
+                width: 72px;
+                height: 36px;
+            }
+
+            .diya-message {
+                min-height: 80px;
+            }
+        }
+
+        /* Landscape orientation optimization */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .header {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+                margin-bottom: 5px;
+            }
+
+            .instruction {
+                font-size: 0.8rem;
+                margin: 5px 0;
+            }
+
+            .interactive-container {
+                padding: 10px 20px 100px;
+                min-height: calc(100vh - 120px);
+            }
+
+            .diyas-container {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+
+            .diya {
+                width: 70px;
+                height: 70px;
+            }
+
+            .diya-body {
+                width: 55px;
+                height: 28px;
+            }
+
+            .diya-message {
+                font-size: 0.75rem;
+                padding: 8px;
+                min-height: 50px;
+            }
+
+            .fire-source {
+                bottom: 60px;
+            }
+
+            .fire {
+                width: 50px;
+                height: 65px;
+            }
+
+            .progress-container {
+                padding: 10px;
+                bottom: 10px;
+            }
+
+            .progress-text {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+            }
+
+            .completion-card {
+                padding: 20px;
+            }
+
+            .completion-card h2 {
+                font-size: 1.5rem;
+                margin-bottom: 10px;
+            }
+
+            .completion-card p {
+                font-size: 0.9rem;
+                margin: 10px 0;
+            }
+
+            .completion-icon {
+                font-size: 2.5rem;
+                margin: 10px 0;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .diya {
+                min-height: 48px;
+                min-width: 48px;
+            }
+
+            .fire-source {
+                min-height: 48px;
+                min-width: 48px;
+            }
+
+            .back-btn, .action-btn {
+                min-height: 48px;
+                padding: 16px 35px;
+            }
+
+            /* Increase hit targets for better touch interaction */
+            .diya::before {
+                content: '';
+                position: absolute;
+                top: -10px;
+                left: -10px;
+                right: -10px;
+                bottom: -10px;
+                z-index: -1;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .diya-body,
+            .diya-flame {
+                image-rendering: -webkit-optimize-contrast;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>{{ config.title }}</h1>
+        <p class="instruction">
+            {% if config.event == 'diwali' %}
+                🔥 Drag the fire to light each diya and reveal special messages! 🔥
+            {% endif %}
+        </p>
+    </div>
+
+    {% if config.event == 'diwali' %}
+    <!-- Diwali Interactive -->
+    <div class="interactive-container">
+        <!-- Fire Source (Draggable) -->
+        <div class="fire-source" id="fireSource" draggable="true">
+            <div class="fire">
+                <div class="flame"></div>
+            </div>
+            <div class="fire-label">Drag Me! 🔥</div>
+        </div>
+
+        <!-- Diyas Container -->
+        <div class="diyas-container" id="diyasContainer">
+            {% for message in config.messages %}
+            <div class="diya-wrapper">
+                <div class="diya" data-message="{{ forloop.counter }}">
+                    <div class="diya-smoke"></div>
+                    <div class="diya-flame"></div>
+                    <div class="diya-oil"></div>
+                    <div class="diya-body"></div>
+                </div>
+                <div class="diya-message">{{ message }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-text">Diyas Lit: <span id="litCount">0</span>/{{ config.messages|length }}</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- Completion Overlay -->
+    <div class="completion-overlay" id="completionOverlay">
+        <div class="completion-card">
+            <div class="completion-icon">🎆✨🪔</div>
+            <h2>All Diyas Are Lit! 🎉</h2>
+            <p>You've illuminated the festival of lights with joy and prosperity!</p>
+            <p>May your life be as bright and beautiful as these diyas! 🪔✨</p>
+            <button class="back-btn" onclick="window.history.back()">Back to Greeting</button>
+        </div>
+    </div>
+
+    <script>
+        // Diwali Interactive Logic with Enhanced Tracking and Interaction
+        const fireSource = document.getElementById('fireSource');
+        const diyas = document.querySelectorAll('.diya');
+        const progressFill = document.getElementById('progressFill');
+        const litCount = document.getElementById('litCount');
+        const completionOverlay = document.getElementById('completionOverlay');
+        const totalDiyas = {{ config.messages|length }};
+        const gameId = {{ game_id|default:"null" }};
+        
+        let litDiyasCount = 0;
+        let gameStartTime = Date.now();
+        let draggedElement = null;
+        let ghostElement = null;
+        let isDragging = false;
+
+        // Track game start
+        console.log('🎮 Game started. ID:', gameId);
+        console.log('📱 Device info:', {
+            userAgent: navigator.userAgent,
+            screen: { width: window.screen.width, height: window.screen.height },
+            viewport: { width: window.innerWidth, height: window.innerHeight },
+            touchSupport: 'ontouchstart' in window,
+            pixelRatio: window.devicePixelRatio
+        });
+
+        function sendTrackingData(diyaNumber) {
+            if (!gameId) {
+                console.log('⚠️ No game ID, tracking skipped');
+                return;
+            }
+            
+            const timeFromStart = (Date.now() - gameStartTime) / 1000;
+            
+            console.log('📊 Sending tracking data for diya', diyaNumber);
+            
+            fetch('{% url "track_diya_light" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    game_id: gameId,
+                    diya_number: diyaNumber,
+                    diyas_lit: litDiyasCount,
+                    time_from_start: timeFromStart
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ Tracking response:', data);
+                if (data.is_completed) {
+                    console.log('🏆 Game completed! Score:', data.score);
+                }
+            })
+            .catch(error => console.error('❌ Tracking error:', error));
+        }
+
+        // Desktop Drag & Drop
+        fireSource.addEventListener('dragstart', (e) => {
+            console.log('🖱️ Desktop drag started');
+            draggedElement = fireSource;
+            isDragging = true;
+            e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => fireSource.style.opacity = '0.5', 0);
+        });
+
+        fireSource.addEventListener('dragend', (e) => {
+            console.log('🖱️ Desktop drag ended');
+            fireSource.style.opacity = '1';
+            draggedElement = null;
+            isDragging = false;
+        });
+
+        // Mobile Touch Events with improved handling
+        let touchStartPos = { x: 0, y: 0 };
+        let currentTouchDiya = null;
+        
+        fireSource.addEventListener('touchstart', (e) => {
+            console.log('👆 Touch started');
+            e.preventDefault();
+            draggedElement = fireSource;
+            isDragging = true;
+            
+            const touch = e.touches[0];
+            touchStartPos = { x: touch.clientX, y: touch.clientY };
+            
+            // Create ghost element for better visual feedback
+            ghostElement = fireSource.cloneNode(true);
+            ghostElement.classList.add('drag-ghost');
+            ghostElement.style.position = 'fixed';
+            ghostElement.style.pointerEvents = 'none';
+            ghostElement.style.zIndex = '99999';
+            ghostElement.style.width = fireSource.offsetWidth + 'px';
+            ghostElement.style.height = fireSource.offsetHeight + 'px';
+            document.body.appendChild(ghostElement);
+            
+            updateGhostPosition(touch);
+            fireSource.style.opacity = '0.3';
+        }, { passive: false });
+
+        fireSource.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            if (ghostElement) {
+                const touch = e.touches[0];
+                updateGhostPosition(touch);
+                
+                // Check collision with diyas using elementFromPoint
+                const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (elementBelow) {
+                    const diya = elementBelow.closest('.diya');
+                    
+                    // Reset previous hover
+                    if (currentTouchDiya && currentTouchDiya !== diya) {
+                        currentTouchDiya.style.transform = '';
+                        currentTouchDiya.style.filter = '';
+                    }
+                    
+                    // Apply hover effect to current diya
+                    if (diya && !diya.classList.contains('lit')) {
+                        diya.style.transform = 'scale(1.15)';
+                        diya.style.filter = 'brightness(1.2) drop-shadow(0 0 20px rgba(255, 193, 7, 0.8))';
+                        currentTouchDiya = diya;
+                    } else {
+                        currentTouchDiya = null;
+                    }
+                }
+            }
+        }, { passive: false });
+
+        fireSource.addEventListener('touchend', (e) => {
+            console.log('👆 Touch ended');
+            e.preventDefault();
+            
+            if (ghostElement) {
+                const touch = e.changedTouches[0];
+                const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                
+                if (elementBelow) {
+                    const diya = elementBelow.closest('.diya');
+                    if (diya && !diya.classList.contains('lit')) {
+                        console.log('🔥 Lighting diya via touch');
+                        lightDiya(diya);
+                    }
+                }
+                
+                ghostElement.remove();
+                ghostElement = null;
+            }
+            
+            // Reset all diya transforms
+            diyas.forEach(d => {
+                d.style.transform = '';
+                d.style.filter = '';
+            });
+            
+            fireSource.style.opacity = '1';
+            draggedElement = null;
+            isDragging = false;
+            currentTouchDiya = null;
+        }, { passive: false });
+
+        // Cancel touch if scrolling
+        fireSource.addEventListener('touchcancel', (e) => {
+            console.log('❌ Touch cancelled');
+            if (ghostElement) {
+                ghostElement.remove();
+                ghostElement = null;
+            }
+            fireSource.style.opacity = '1';
+            isDragging = false;
+            currentTouchDiya = null;
+        });
+
+        function updateGhostPosition(touch) {
+            if (ghostElement) {
+                const offsetX = ghostElement.offsetWidth / 2;
+                const offsetY = ghostElement.offsetHeight / 2;
+                ghostElement.style.left = (touch.clientX - offsetX) + 'px';
+                ghostElement.style.top = (touch.clientY - offsetY) + 'px';
+            }
+        }
+
+        diyas.forEach((diya, index) => {
+            // Desktop drag over
+            diya.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (!diya.classList.contains('lit') && draggedElement) {
+                    diya.style.transform = 'scale(1.15)';
+                    diya.style.filter = 'brightness(1.2) drop-shadow(0 0 20px rgba(255, 193, 7, 0.8))';
+                }
+            });
+
+            diya.addEventListener('dragleave', (e) => {
+                if (!diya.classList.contains('lit')) {
+                    diya.style.transform = '';
+                    diya.style.filter = '';
+                }
+            });
+
+            diya.addEventListener('drop', (e) => {
+                e.preventDefault();
+                diya.style.transform = '';
+                diya.style.filter = '';
+                if (draggedElement && !diya.classList.contains('lit')) {
+                    console.log('🔥 Lighting diya via drop');
+                    lightDiya(diya);
+                }
+            });
+
+            // Click/Tap to light (alternative interaction method)
+            diya.addEventListener('click', (e) => {
+                if (!isDragging && !diya.classList.contains('lit')) {
+                    console.log('🔥 Lighting diya via click');
+                    lightDiya(diya);
+                }
+            });
+        });
+
+        function lightDiya(diya) {
+            if (diya.classList.contains('lit')) {
+                console.log('⚠️ Diya already lit');
+                return;
+            }
+            
+            const diyaNumber = litDiyasCount + 1;
+            console.log('✨ Lighting diya #' + diyaNumber);
+            
+            diya.classList.add('lit');
+            litDiyasCount++;
+            
+            // Update progress UI
+            litCount.textContent = litDiyasCount;
+            const progressPercent = (litDiyasCount / totalDiyas * 100);
+            progressFill.style.width = progressPercent + '%';
+            
+            // Visual feedback
+            diya.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                diya.style.transform = '';
+            }, 300);
+            
+            // Play sound effect
+            playLightSound();
+            
+            // Send tracking data
+            sendTrackingData(diyaNumber);
+            
+            // Vibrate on mobile (if supported)
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+            }
+            
+            // Check if all diyas are lit
+            if (litDiyasCount === totalDiyas) {
+                console.log('🎉 All diyas lit! Showing completion');
+                setTimeout(() => {
+                    completionOverlay.classList.add('show');
+                    celebrate();
+                }, 1000);
+            }
+        }
+
+        function playLightSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                console.log('🔇 Audio not supported:', e);
+            }
+        }
+
+        function celebrate() {
+            console.log('🎊 Starting celebration');
+            
+            // Create celebration particles
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    createSparkle();
+                }, i * 30);
+            }
+            
+            // Vibrate pattern on mobile
+            if ('vibrate' in navigator) {
+                navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+            
+            // Play celebration sound
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.5);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log('🔇 Celebration audio not supported');
+            }
+        }
+
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.style.position = 'fixed';
+            sparkle.style.left = Math.random() * window.innerWidth + 'px';
+            sparkle.style.top = Math.random() * window.innerHeight + 'px';
+            sparkle.style.width = (Math.random() * 4 + 4) + 'px';
+            sparkle.style.height = sparkle.style.width;
+            sparkle.style.background = ['#ffeb3b', '#ff9800', '#f44336', '#ffc107', '#ffee58'][Math.floor(Math.random() * 5)];
+            sparkle.style.borderRadius = '50%';
+            sparkle.style.pointerEvents = 'none';
+            sparkle.style.zIndex = '9999';
+            sparkle.style.boxShadow = '0 0 10px currentColor';
+            document.body.appendChild(sparkle);
+
+            sparkle.animate([
+                { transform: 'scale(0) rotate(0deg)', opacity: 1 },
+                { transform: 'scale(2) rotate(360deg)', opacity: 0 }
+            ], {
+                duration: 1500,
+                easing: 'ease-out'
+            });
+
+            setTimeout(() => sparkle.remove(), 1500);
+        }
+
+        // Prevent default touch behaviors that might interfere with dragging
+        document.body.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Prevent context menu on long press (mobile)
+        fireSource.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        diyas.forEach(diya => {
+            diya.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
+        });
+
+        console.log('✅ Interactive page initialized');
+    </script>
+    {% endif %}
+</body>
+</html>

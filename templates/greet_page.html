@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Diwali - Festival of Lights</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 25%, #ffd23f 50%, #ff6b9d 75%, #c44569 100%);
+            font-family: 'Georgia', serif;
+            overflow-x: hidden;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .decorative-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 8px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            margin: 1rem;
+            pointer-events: none;
+        }
+
+        .main-content {
+            text-align: center;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-heading {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #d35400;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            color: #e67e22;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .greeting-english {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            border-left: 5px solid #f39c12;
+        }
+
+        .greeting-gujarati {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 182, 193, 0.1);
+            border-radius: 15px;
+            border-left: 5px solid #e74c3c;
+            font-family: 'Noto Sans Gujarati', sans-serif;
+        }
+
+        .diya-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .diya {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .diya-base {
+            width: 50px;
+            height: 25px;
+            background: linear-gradient(45deg, #8b4513, #d2691e);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+        }
+
+        .diya-flame {
+            width: 12px;
+            height: 20px;
+            background: linear-gradient(to top, #ff6b35, #ffd23f);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute;
+            top: -10px;
+            left: 24px;
+            animation: flicker 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); }
+            100% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); }
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
+
+        .rangoli {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            opacity: 0.3;
+        }
+
+        .rangoli-1 {
+            top: 10%;
+            left: 10%;
+            animation: rotate 20s linear infinite;
+        }
+
+        .rangoli-2 {
+            top: 20%;
+            right: 15%;
+            animation: rotate 25s linear infinite reverse;
+        }
+
+        .rangoli-3 {
+            bottom: 15%;
+            left: 20%;
+            animation: rotate 30s linear infinite;
+        }
+
+        .rangoli-4 {
+            bottom: 25%;
+            right: 10%;
+            animation: rotate 22s linear infinite reverse;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .sparkles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .sparkle {
+            position: absolute;
+            color: #ffd700;
+            font-size: 1.5rem;
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        .sparkle:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
+        .sparkle:nth-child(2) { top: 30%; right: 20%; animation-delay: 0.5s; }
+        .sparkle:nth-child(3) { bottom: 25%; left: 25%; animation-delay: 1s; }
+        .sparkle:nth-child(4) { bottom: 35%; right: 15%; animation-delay: 1.5s; }
+        .sparkle:nth-child(5) { top: 15%; left: 50%; animation-delay: 2s; }
+        .sparkle:nth-child(6) { bottom: 20%; right: 45%; animation-delay: 2.5s; }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .lantern {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            opacity: 0.4;
+        }
+
+        .lantern-1 {
+            top: 25%;
+            left: 5%;
+            animation: sway 4s ease-in-out infinite;
+        }
+
+        .lantern-2 {
+            top: 35%;
+            right: 8%;
+            animation: sway 5s ease-in-out infinite reverse;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-heading {
+                font-size: 2.5rem;
+            }
+            
+            .main-content {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .greeting-english, .greeting-gujarati {
+                font-size: 1rem;
+            }
+            
+            .diya-container {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="decorative-border"></div>
+        
+        <!-- Rangoli Patterns -->
+        <svg class="rangoli rangoli-1" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#e74c3c" stroke-width="2"></circle>
+            <circle cx="50" cy="50" r="30" fill="none" stroke="#f39c12" stroke-width="2"></circle>
+            <circle cx="50" cy="50" r="20" fill="none" stroke="#e67e22" stroke-width="2"></circle>
+            <circle cx="50" cy="50" r="10" fill="#d35400"></circle>
+            <path d="M50,10 L60,40 L90,40 L68,58 L78,88 L50,70 L22,88 L32,58 L10,40 L40,40 Z" fill="#c0392b" opacity="0.7"></path>
+        </svg>
+        
+        <svg class="rangoli rangoli-2" viewBox="0 0 100 100">
+            <polygon points="50,5 65,35 95,35 75,55 85,85 50,65 15,85 25,55 5,35 35,35" fill="#f39c12" opacity="0.8"></polygon>
+            <circle cx="50" cy="50" r="15" fill="#e74c3c"></circle>
+            <circle cx="50" cy="50" r="8" fill="#ffd700"></circle>
+        </svg>
+        
+        <svg class="rangoli rangoli-3" viewBox="0 0 100 100">
+            <rect x="25" y="25" width="50" height="50" fill="none" stroke="#e67e22" stroke-width="3" transform="rotate(45 50 50)"></rect>
+            <circle cx="50" cy="50" r="25" fill="none" stroke="#d35400" stroke-width="2"></circle>
+            <circle cx="50" cy="50" r="12" fill="#f39c12"></circle>
+        </svg>
+        
+        <svg class="rangoli rangoli-4" viewBox="0 0 100 100">
+            <path d="M50,10 L70,30 L90,50 L70,70 L50,90 L30,70 L10,50 L30,30 Z" fill="#e74c3c" opacity="0.6"></path>
+            <circle cx="50" cy="50" r="20" fill="none" stroke="#ffd700" stroke-width="3"></circle>
+            <circle cx="50" cy="50" r="8" fill="#d35400"></circle>
+        </svg>
+        
+        <!-- Lanterns -->
+        <svg class="lantern lantern-1" viewBox="0 0 40 60">
+            <ellipse cx="20" cy="45" rx="15" ry="12" fill="#e74c3c"></ellipse>
+            <rect x="15" y="35" width="10" height="20" fill="#c0392b"></rect>
+            <line x1="20" y1="5" x2="20" y2="35" stroke="#8b4513" stroke-width="2"></line>
+            <circle cx="20" cy="45" r="3" fill="#ffd700"></circle>
+        </svg>
+        
+        <svg class="lantern lantern-2" viewBox="0 0 40 60">
+            <ellipse cx="20" cy="45" rx="15" ry="12" fill="#f39c12"></ellipse>
+            <rect x="15" y="35" width="10" height="20" fill="#e67e22"></rect>
+            <line x1="20" y1="5" x2="20" y2="35" stroke="#8b4513" stroke-width="2"></line>
+            <circle cx="20" cy="45" r="3" fill="#fff"></circle>
+        </svg>
+        
+        <!-- Sparkles -->
+        <div class="sparkles">
+            <div class="sparkle">✨</div>
+            <div class="sparkle">⭐</div>
+            <div class="sparkle">✨</div>
+            <div class="sparkle">💫</div>
+            <div class="sparkle">✨</div>
+            <div class="sparkle">⭐</div>
+        </div>
+        
+        <div class="main-content">
+            <h1 class="main-heading">Happy Diwali, {{ contact.greeting_name }}! ✨</h1>
+            
+            <p class="tagline">Light up your life this Diwali ✨ / આ દિવાળી તમારી જીંદગી પ્રકાશિત કરો ✨</p>
+            
+            <div class="diya-container">
+                <div class="diya">
+                    <div class="diya-base"></div>
+                    <div class="diya-flame"></div>
+                </div>
+                <div class="diya">
+                    <div class="diya-base"></div>
+                    <div class="diya-flame"></div>
+                </div>
+                <div class="diya">
+                    <div class="diya-base"></div>
+                    <div class="diya-flame"></div>
+                </div>
+                <div class="diya">
+                    <div class="diya-base"></div>
+                    <div class="diya-flame"></div>
+                </div>
+                <div class="diya">
+                    <div class="diya-base"></div>
+                    <div class="diya-flame"></div>
+                </div>
+            </div>
+            
+            <div class="greeting-english">
+                Wishing you a Diwali full of light, laughter, and love. May the festival of lights brighten your life with joy, prosperity, and endless happiness.
+            </div>
+            
+            <div class="greeting-gujarati">
+                દિવાળી ના પાવન અવસરે તમને ઉજ્જવલતા, આનંદ અને પ્રેમ ભરેલી જીંદગીની શુભકામનાઓ. શુભ દિવાળી!
+            </div>
+        </div>
+    </main>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99129e27c69b8fcd',t:'MTc2MDkwMTQ2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>

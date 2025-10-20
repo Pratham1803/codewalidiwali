@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Code Wali Diwali</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .stat-card h3 {
+            color: #888;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .device-stats {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .device-badge {
+            flex: 1;
+            padding: 8px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .device-badge strong {
+            display: block;
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table thead {
+            background: #667eea;
+            color: white;
+        }
+
+        table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge.in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge.mobile {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge.desktop {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .badge.tablet {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .score-highlight {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card .stat-value {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            table th, table td {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .dashboard-header {
+                padding: 20px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .section h2 {
+                font-size: 1.4rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            .device-stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>📊 Analytics Dashboard</h1>
+            <p>Track visitor engagement and game interactions</p>
+        </div>
+
+        <!-- Key Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Contacts</h3>
+                <div class="stat-value">{{ stats.total_contacts }}</div>
+                <div class="stat-label">Registered Users</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Page Visits</h3>
+                <div class="stat-value">{{ stats.total_visits }}</div>
+                <div class="stat-label">Total Views</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Games Started</h3>
+                <div class="stat-value">{{ stats.games_started }}</div>
+                <div class="stat-label">Interactions</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Games Completed</h3>
+                <div class="stat-value">{{ stats.games_completed }}</div>
+                <div class="stat-label">Finished Games</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ stats.completion_rate }}%;"></div>
+                </div>
+                <div class="stat-label" style="margin-top: 5px;">{{ stats.completion_rate|floatformat:1 }}% completion rate</div>
+            </div>
+        </div>
+
+        <!-- Device Statistics -->
+        <div class="section">
+            <h2>📱 Device Breakdown</h2>
+            <div class="device-stats">
+                <div class="device-badge">
+                    <strong>{{ device_stats.mobile }}</strong>
+                    Mobile
+                </div>
+                <div class="device-badge">
+                    <strong>{{ device_stats.desktop }}</strong>
+                    Desktop
+                </div>
+                <div class="device-badge">
+                    <strong>{{ device_stats.tablet }}</strong>
+                    Tablet
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Scores -->
+        <div class="section">
+            <h2>🏆 Top Scores</h2>
+            {% if top_scores %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Contact Name</th>
+                                <th>Event Type</th>
+                                <th>Score</th>
+                                <th>Time Taken</th>
+                                <th>Device</th>
+                                <th>Completed At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for game in top_scores %}
+                            <tr>
+                                <td><strong>#{{ forloop.counter }}</strong></td>
+                                <td>{{ game.contact.contact_name }}</td>
+                                <td>{{ game.event_type|title }}</td>
+                                <td><span class="score-highlight">{{ game.score }}</span></td>
+                                <td>{{ game.time_taken_seconds|floatformat:1 }}s</td>
+                                <td>
+                                    <span class="badge {{ game.device_type }}">
+                                        {{ game.device_type|title }}
+                                    </span>
+                                </td>
+                                <td>{{ game.completed_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">🎮</div>
+                    <p>No completed games yet. Start playing to see top scores!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Visits -->
+        <div class="section">
+            <h2>👁️ Recent Visits</h2>
+            {% if recent_visits %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Contact Name</th>
+                                <th>Greeting Name</th>
+                                <th>Device Type</th>
+                                <th>IP Address</th>
+                                <th>Visited At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visit in recent_visits %}
+                            <tr>
+                                <td>{{ visit.contact.contact_name }}</td>
+                                <td>{{ visit.contact.greeting_name }}</td>
+                                <td>
+                                    <span class="badge {{ visit.device_type }}">
+                                        {{ visit.device_type|title }}
+                                    </span>
+                                </td>
+                                <td>{{ visit.ip_address }}</td>
+                                <td>{{ visit.visited_at|date:"M d, Y H:i:s" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">👤</div>
+                    <p>No visits recorded yet.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Games -->
+        <div class="section">
+            <h2>🎯 Recent Game Interactions</h2>
+            {% if recent_games %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Contact Name</th>
+                                <th>Event Type</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Score</th>
+                                <th>Device</th>
+                                <th>Started At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for game in recent_games %}
+                            <tr>
+                                <td>{{ game.contact.contact_name }}</td>
+                                <td>{{ game.event_type|title }}</td>
+                                <td>
+                                    {% if game.is_completed %}
+                                        <span class="badge completed">✓ Completed</span>
+                                    {% else %}
+                                        <span class="badge in-progress">⏳ In Progress</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ game.diyas_lit }}/{{ game.total_diyas }} diyas
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ game.completion_percentage }}%;"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if game.score %}
+                                        <span class="score-highlight">{{ game.score }}</span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge {{ game.device_type }}">
+                                        {{ game.device_type|title }}
+                                    </span>
+                                </td>
+                                <td>{{ game.started_at|date:"M d, Y H:i:s" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">🎲</div>
+                    <p>No game interactions recorded yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
