@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import models
 from django.contrib.admin.views.decorators import staff_member_required
 import json
+from django.http import HttpResponse
 
 def get_client_ip(request):
     """Get client IP address from request"""
@@ -36,8 +37,8 @@ def get_greeting_occasion():
     # Define event date ranges (you can customize these)
     # Format: (start_month, start_day, end_month, end_day, event_name)
     event_dates = [
-        (10, 20, 11, 5, 'diwali'),      # Diwali: Oct 20 - Nov 5
-        (12, 25, 1, 7, 'newyear'),      # New Year: Dec 25 - Jan 7
+        (10, 20, 10, 20, 'diwali'),      # Diwali: Oct 20 - Nov 5
+        (10, 21, 11, 5, 'newyear'),      # New Year: Dec 25 - Jan 7
         (10, 28, 11, 3, 'bhaidooj'),    # Bhai Dooj: Oct 28 - Nov 3
     ]
     
@@ -54,6 +55,11 @@ def get_greeting_occasion():
     
     # Default to diwali if no event matches
     return 'diwali', today
+
+def date(request):
+    """View to return current date and occasion"""
+    occasion, today = get_greeting_occasion()
+    return HttpResponse(f"Today's date is {today.strftime('%Y-%m-%d')}, Occasion: {occasion}")
 
 def get_event_config(event_type, greeting_name=None):
     """Get event-specific configuration"""
