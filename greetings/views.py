@@ -87,9 +87,9 @@ def get_event_config(event_type, greeting_name=None):
         },
         'newyear': {
             'event': 'newyear',
-            'title': f'Happy New Year {name}! 🎉',
-            'subtitle': 'Welcome 2026',
-            'welcome_message': f'Wishing you a fantastic New Year filled with new opportunities and wonderful moments!',
+            'title': f'નૂતન વર્ષાભિનંદન, {name}! 🎉',
+            'subtitle': 'Happy New Year',
+            'welcome_message': f'નવું વર્ષ, નવા વિચાર, નવી આશા અને નવા સંકલ્પની સાથે આપને અને આપના પરિવારને સુખ, શાંતિ અને સમૃદ્ધિ આપે નૂતન વર્ષનો અરૂણોદય આપના જીવનને નિત્ય નવી ઉર્જા, ઉમંગ અને ઉત્સાહથી 🥳 પરિપૂર્ણ કરે તેવી નૂતન વર્ષની અનેક અનેક શુભકામનાઓ...🎉🌻☀️🐝 નૂતન વર્ષા અભિનંદન 🐝☀️🌻',
             'button_text': 'Celebrate with Fireworks 🎆',
             'theme_color': '#4ecdc4',
             'secondary_color': '#3498db',
@@ -154,8 +154,6 @@ def interactive_page(request, unique_id):
     
     if contact:
         config = get_event_config(occasion, contact.greeting_name)
-        
-        # Create game interaction tracking
         game_interaction = GameInteraction.objects.create(
             contact=contact,
             event_type=occasion,
@@ -163,6 +161,16 @@ def interactive_page(request, unique_id):
             ip_address=get_client_ip(request),
             total_diyas=len(config.get('messages', []))
         )
+        # Route to New Year fireworks when occasion is 'newyear'
+        if config.get('event') == 'newyear':
+            return render(request, 'greetings/newyear_fireworks.html', {
+                'contact': contact,
+                'occasion': occasion,
+                'config': config,
+                'game_id': game_interaction.id
+            })
+
+        # Default (Diwali game)
         
         return render(request, 'greetings/interactive_page.html', {
             'contact': contact,
@@ -172,6 +180,12 @@ def interactive_page(request, unique_id):
         })
     else:
         config = get_event_config(occasion)
+        if config.get('event') == 'newyear':
+            return render(request, 'greetings/newyear_fireworks.html', {
+                'contact': None,
+                'occasion': occasion,
+                'config': config                
+            })
         return render(request, 'greetings/interactive_page.html', {
             'contact': None,
             'occasion': occasion,
